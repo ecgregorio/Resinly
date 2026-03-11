@@ -70,6 +70,8 @@ async def on_ready():
     if bot.user is None: # guard check
         return
     print(f"We are ready to go in, {bot.user.name}")
+
+    await bot.change_presence(activity=discord.CustomActivity(name="/setup | !resin"))
     
     # sync slash commands
     try:
