@@ -1,6 +1,17 @@
 # Resinly
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![discord.py](https://img.shields.io/badge/discord.py-2.x-5865F2?logo=discord&logoColor=white)
+![genshin.py](https://img.shields.io/badge/genshin.py-supported-2E8B57)
+![Last Commit](https://img.shields.io/github/last-commit/ecgregorio/Resinly)
+![Repo Size](https://img.shields.io/github/repo-size/ecgregorio/Resinly)
+
 Resinly is a Discord bot for tracking resin in Genshin Impact.
+
+## Invite Link
+Feel free to try out Resinly!
+
+- [Resinly]https://discord.com/oauth2/authorize?client_id=1481178070114238506&permissions=274877975552&integration_type=0&scope=bot+applications.commands
 
 ## What It Does
 - Stores each user's UID.
