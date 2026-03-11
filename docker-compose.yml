@@ -1,0 +1,12 @@
+services:
+  bot:
+    container_name: resinly-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      # - ./discord.log:/app/discord.log

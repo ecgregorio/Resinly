@@ -1,0 +1,22 @@
+# Git and local metadata
+.git
+.gitignore
+.github
+.vscode
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+venv
+.venv
+
+# Local runtime files and secrets
+.env
+discord.log
+data/subscriptions.json
+
+# Docs and notes
+deployment.md
