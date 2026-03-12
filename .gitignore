@@ -18,6 +18,3 @@ data/subscriptions.json
 
 # vscode
 .vscode/
-
-# stuff
-deployment.md
