@@ -152,9 +152,21 @@ async def clearcookies(ctx):
 # show current banner in genshin
 @bot.command()
 async def banner(ctx):
+    # use per-user credential flow just like in !resin
+    data = load_subscriptions()
+    user_id = str(ctx.author.id)
+    state = data.get(user_id, {})
+    
+    if "ltuid_v2" not in state or "ltoken_v2" not in state:
+        await ctx.send("No HoYoLab cookies found for your account. Use /setup first.")
+        return
+    
     try:
-        # get a genshin.Client
-        client = build_genshin_client()
+        # build genshin client
+        user_ltuid = decrypt_value(state["ltuid_v2"])
+        user_ltoken = decrypt_value(state["ltoken_v2"])
+        client = build_genshin_client(user_ltuid, user_ltoken)
+        
         # call await client.get_banner_details()
         banners = await client.get_banner_details()
         if not banners:
