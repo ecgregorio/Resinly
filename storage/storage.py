@@ -66,3 +66,8 @@ def build_genshin_client(user_ltuid: str | None = None, user_ltoken: str | None 
     if not ltuid_v2 or not ltoken_v2:
         raise RuntimeError("No valid HoYoLab cookies available.")
     return genshin.Client({"ltuid_v2": ltuid_v2, "ltoken_v2": ltoken_v2})
+
+
+def build_hsr_client(user_ltuid: str | None = None, user_ltoken: str | None = None) -> genshin.Client:
+    # HSR and Genshin chronicle endpoints both use HoYoLab cookie auth.
+    return build_genshin_client(user_ltuid, user_ltoken)

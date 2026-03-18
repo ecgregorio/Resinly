@@ -11,6 +11,7 @@ from storage.storage import (
     decrypt_value,
     encrypt_value,
     build_genshin_client,
+    build_hsr_client,
 )
 
 from app.bot_core import (
@@ -88,7 +89,7 @@ async def resin(ctx):
         f"Recovery: {notes.remaining_resin_recovery_time}"
     )
 
-# pwoer - check current trailblaze power + remaining time until full 
+# power - check current trailblaze power + remaining time until full 
 @bot.command()
 async def power(ctx):
     # get user data
@@ -96,25 +97,31 @@ async def power(ctx):
     user_id = str(ctx.author.id)
     state = data.get(user_id, {})
     
-    uid = state.get("uid")
+    uid = state.get("hsr_uid")
     
-    # require per-user setup for UID to avoid falling back to default credentials
+    # require per-user HSR setup for UID to avoid cross-game UID issues
     if not uid:
-        await ctx.send("Invalid credentials. No UID found for your account. Use `/setup` to configure your UID and HoYoLab cookies.")
+        await ctx.send("No HSR UID found. Use `!sethsruid <your_hsr_uid>` first.")
         return
 
     try:
         user_ltuid = decrypt_value(state["ltuid_v2"]) if "ltuid_v2" in state else None
         user_ltoken = decrypt_value(state["ltoken_v2"]) if "ltoken_v2" in state else None
-        client = build_genshin_client(user_ltuid, user_ltoken)
+        client = build_hsr_client(user_ltuid, user_ltoken)
         notes = await client.get_starrail_notes(int(uid))
+    except genshin.GenshinException as e:
+        await ctx.send(
+            "Could not fetch Trailblaze Power. Verify your HSR UID and account cookies are valid. "
+            f"Details: {type(e).__name__}"
+        )
+        return
     except Exception as e:
-        await ctx.send(f"Could not fetch Trailblaze Power: {type(e).__name__}")
+        await ctx.send(f"Could not fetch Trailblaze Power: {type(e).__name__}: {e}")
         return
     
     # success
     await ctx.send(
-        f"UID `{uid}` | : {notes.current_stamina}/{notes.max_stamina} | "
+        f"HSR UID `{uid}` | Trailblaze Power: {notes.current_stamina}/{notes.max_stamina} | "
         f"Recovery: {notes.stamina_recover_time}"
     )
     
@@ -157,6 +164,40 @@ async def myuid(ctx):
         return
     
     await ctx.send(f"Your saved UID is `{uid}`")
+
+# sethsruid <uid>
+@bot.command()
+async def sethsruid(ctx, uid: str):
+    # validate (digits only, len == 9)
+    if not uid.isdigit() or len(uid) != 9:
+        await ctx.send("HSR UID must be a 9-digit number. Example: `!sethsruid 800123456`")
+        return
+
+    data = load_subscriptions()
+    user_id = str(ctx.author.id)
+
+    state = data.get(user_id, {})
+    state["hsr_uid"] = uid
+    state.setdefault("enabled", True)
+    state.setdefault("notified_full", False)
+
+    data[user_id] = state
+    save_subscriptions(data)
+
+    await ctx.send(f"Saved HSR UID `{uid}` for {ctx.author.mention}")
+
+# myhsruid
+@bot.command()
+async def myhsruid(ctx):
+    data = load_subscriptions()
+    user_id = str(ctx.author.id)
+    uid = data.get(user_id, {}).get("hsr_uid")
+
+    if not uid:
+        await ctx.send("No HSR UID saved yet. Use `!sethsruid <your_hsr_uid>`.")
+        return
+
+    await ctx.send(f"Your saved HSR UID is `{uid}`")
 
 # notify user
 @bot.command()
