@@ -25,11 +25,17 @@ default_genshin_uid = os.getenv('GENSHIN_UID')
 ### --- Helpers --- ###
 # parses tags sent by get_banner_details
 def clean_banner_content(raw: str, limit: int = 1000) -> str:
+    # decode escaped entities
     text = html.unescape(raw or "")
+     # convert line-break tags into real newlines
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    # convert paragraph end tags into newlines
     text = re.sub(r"</p>", "\n", text, flags=re.IGNORECASE)
-    text = re.sub(r"<color=[^>]+>(.*?)</color>", r"**\1**", text, flags=re.IGNORECASE | re.DOTALL)
-    text = re.sub(r"<[^>]+>","",text) # strip any remaining tags
+    # convert color tags into bold text using capture group 1
+    text = re.sub(r"<color.*?>(.*?)</color>", r"**\1**", text, flags=re.IGNORECASE | re.DOTALL)
+    # strip any remaining tags
+    text = re.sub(r"<[^>]+>","",text)
+    # collapse excessive blank lines
     text = re.sub(r"\n{3,}","\n\n", text).strip()
     
     if len(text) > limit:
