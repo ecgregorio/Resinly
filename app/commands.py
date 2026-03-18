@@ -148,3 +148,37 @@ async def clearcookies(ctx):
     data[user_id] = state
     save_subscriptions(data)
     await ctx.send("Your cookies have been removed.")
+    
+# show current banner in genshin
+@bot.command()
+async def banner(ctx):
+    try:
+        # get a genshin.Client
+        client = build_genshin_client()
+        # call await client.get_banner_details()
+        banners = await client.get_banner_details()
+        if not banners:
+            await ctx.send("No banners found.")
+            return
+        
+        # extract banner info
+        banner = banners[0]
+        embed = discord.Embed(
+            title=f"{banner.title} ({banner.banner_type_name})",
+            description=banner.content,
+            color=discord.Color.blue()
+        )
+        # send a discord embed with banner details (+ graphics)
+        embed.add_field(name="Banner Duration", value=banner.date_range, inline=False)
+        
+        # feature 5s and 4s items
+        if banner.r5_up_items:
+            r5_names = ", ".join([item.name for item in banner.r5_up_items])
+            embed.add_field(name="5★ Featured", value=r5_names, inline=False)
+        if banner.r4_up_items:
+            r4_names = ", ".join([item.name for item in banner.r5_up_items])
+            embed.add_field(name="4★ Featured", value=r4_names, inline=False)
+        
+        await ctx.send(embed=embed)
+    except Exception as e:
+        await ctx.send(f"Error fetching banner: {type(e).__name__}")
