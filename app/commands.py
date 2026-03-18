@@ -244,7 +244,7 @@ async def banner(ctx):
             main_embed.add_field(name="4★ Featured", value=r4_names, inline=False)
         
         preview_embeds = []
-        preview_items = [(item, True) for item in r5_items[:2]] + [(item, False) for item in r4_items[:2]]
+        preview_items = [(item, True) for item in r5_items[:2]] + [(item, False) for item in r4_items[:3]]
         for item, is_r5 in preview_items:
             icon_url = getattr(item, "icon", None)
             if not icon_url:
@@ -258,6 +258,6 @@ async def banner(ctx):
             item_embed.set_thumbnail(url=icon_url)
             preview_embeds.append(item_embed)
             
-        await ctx.send(embeds=[main_embed] + preview_embeds[:4])
+        await ctx.send(embeds=[main_embed] + preview_embeds[:5])
     except Exception as e:
         await ctx.send(f"Error fetching banner: {type(e).__name__}: {e}")
