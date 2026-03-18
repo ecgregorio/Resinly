@@ -88,6 +88,36 @@ async def resin(ctx):
         f"Recovery: {notes.remaining_resin_recovery_time}"
     )
 
+# pwoer - check current trailblaze power + remaining time until full 
+@bot.command()
+async def power(ctx):
+    # get user data
+    data = load_subscriptions()
+    user_id = str(ctx.author.id)
+    state = data.get(user_id, {})
+    
+    uid = state.get("uid")
+    
+    # require per-user setup for UID to avoid falling back to default credentials
+    if not uid:
+        await ctx.send("Invalid credentials. No UID found for your account. Use `/setup` to configure your UID and HoYoLab cookies.")
+        return
+
+    try:
+        user_ltuid = decrypt_value(state["ltuid_v2"]) if "ltuid_v2" in state else None
+        user_ltoken = decrypt_value(state["ltoken_v2"]) if "ltoken_v2" in state else None
+        client = build_genshin_client(user_ltuid, user_ltoken)
+        notes = await client.get_starrail_notes(int(uid))
+    except Exception as e:
+        await ctx.send(f"Could not fetch Trailblaze Power: {type(e).__name__}")
+        return
+    
+    # success
+    await ctx.send(
+        f"UID `{uid}` | : {notes.current_stamina}/{notes.max_stamina} | "
+        f"Recovery: {notes.stamina_recover_time}"
+    )
+    
 # setuid <uid>
 @bot.command()
 async def setuid(ctx, uid: str):
