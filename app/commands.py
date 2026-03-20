@@ -308,12 +308,18 @@ async def banner(ctx):
         selected_title = re.sub(r"<[^>]+>", "", selected_title).strip()
         
         selected_type_name = getattr(selected, "banner_type_name", "Unknown Type")
-        selected_content = clean_banner_content(getattr(selected, "content", ""))
         selected_date_range = getattr(selected, "date_range", "Unknown")
         
+        # extract names of the 5-star characters, then join
+        r5_names_list = [getattr(item, "name", "Unknown") for item in r5_items[:2]]
+        if r5_names_list:
+            featured_title = " & ".join(r5_names_list)
+            title = f'{selected_title} ({selected_type_name}) - {featured_title}'
+        else:
+            title = f'{selected_title} ({selected_type_name})'
+        
         main_embed = discord.Embed(
-            title=f"{selected_title} ({selected_type_name})",
-            description=selected_content,
+            title=title,
             color=discord.Color.blue()
         )
         
