@@ -389,7 +389,7 @@ async def leaderboard(ctx, top: int = 10):
     entries = []
     
     for discord_user_id, state in data.items():
-        if discord_user_id == "_meta":
+        if discord_user_id in ("_meta", "_guilds"):
             continue
         if discord_user_id not in member_ids:
             continue
@@ -401,7 +401,7 @@ async def leaderboard(ctx, top: int = 10):
                 display = member.display_name
                 mention = member.mention
             else:
-                user = await bot.fetch_user(int(discord_user_id))
+                user = bot.get_user(int(discord_user_id))
                 display = getattr(user, "name", discord_user_id)
                 mention = f"<@{discord_user_id}>"
         except Exception:
